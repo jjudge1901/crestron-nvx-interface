@@ -1,0 +1,486 @@
+/* ── NVX Control — v2.0 Stylesheet ──────────────────────────── */
+
+:root {
+    --crestron-blue: #0055A9;
+    --dark-bg: #1a1a1a;
+    --panel-bg: #2d2d2d;
+    --text-color: #ffffff;
+    --active-color: #00d0ff;
+    --danger-color: #ff4444;
+    --success-color: #28a745;
+    --warn-color: #ff9800;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    user-select: none;
+}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    background-color: var(--panel-bg);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--crestron-blue);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.highlight {
+    color: var(--crestron-blue);
+}
+
+.status-bar {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+main {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    overflow: hidden;
+}
+
+h2 {
+    border-left: 4px solid var(--crestron-blue);
+    padding-left: 10px;
+    margin-bottom: 1rem;
+}
+
+footer {
+    background-color: var(--panel-bg);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #444;
+}
+
+.footer-left {
+    display: flex;
+    gap: 1rem;
+}
+
+/* ── Connection Status ───────────────────────────────────────── */
+
+.status-connected {
+    color: #00ff00;
+}
+
+.status-disconnected {
+    color: #ff0000;
+}
+
+.status-mock {
+    color: var(--warn-color);
+    font-weight: bold;
+    animation: pulse-mock 2s infinite;
+}
+
+@keyframes pulse-mock {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ── Destination Cards ───────────────────────────────────────── */
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.dest-card {
+    background-color: var(--panel-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dest-card.selected {
+    border-color: var(--active-color);
+    background-color: #3d3d3d;
+    box-shadow: 0 0 15px rgba(0, 208, 255, 0.3);
+}
+
+.dest-card i.main-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.card-top-bar {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+    margin-bottom: 5px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Mode indicator (read-only label showing current mode) */
+.mode-indicator {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.mode-indicator i {
+    font-size: 0.5rem;
+}
+
+.rx-indicator {
+    background-color: rgba(0, 128, 255, 0.2);
+    color: #4da6ff;
+    border: 1px solid #4da6ff;
+}
+
+.rx-indicator i {
+    color: #4da6ff;
+}
+
+.tx-indicator {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: var(--warn-color);
+    border: 1px solid var(--warn-color);
+}
+
+.tx-indicator i {
+    color: var(--warn-color);
+}
+
+/* Mode toggle button (switches mode) */
+.mode-btn {
+    background-color: #444;
+    color: #ccc;
+    border: 1px solid #666;
+    padding: 3px 8px;
+    font-size: 0.65rem;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: all 0.2s;
+}
+
+.mode-btn:hover {
+    background-color: #555;
+    color: white;
+}
+
+.mode-btn.tx-mode:hover {
+    border-color: #4da6ff;
+    color: #4da6ff;
+}
+
+.mode-btn:not(.tx-mode):hover {
+    border-color: var(--warn-color);
+    color: var(--warn-color);
+}
+
+/* Chassis card note */
+.chassis-note {
+    font-size: 0.65rem;
+    color: #888;
+    margin-top: 2px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-style: italic;
+}
+
+.card-bottom-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* ── Source Cards ────────────────────────────────────────────── */
+
+.scroll-container {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--crestron-blue) var(--panel-bg);
+}
+
+.source-card {
+    background-color: var(--panel-bg);
+    min-width: 180px;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.source-card:active {
+    transform: scale(0.95);
+}
+
+.source-card.selected-source {
+    border-color: var(--active-color);
+    background-color: #3d3d3d;
+    box-shadow: 0 0 10px rgba(0, 208, 255, 0.5);
+}
+
+.source-info {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-top: 5px;
+    min-height: 1.2rem;
+}
+
+.sync-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #333;
+    border-radius: 50%;
+    margin-right: 5px;
+    transition: background-color 0.3s;
+}
+
+.sync-active {
+    background-color: #00ff00;
+    box-shadow: 0 0 5px #00ff00;
+}
+
+/* Sources section: hidden until a destination is selected */
+.sources-section {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.sources-section.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+
+.hdcp-btn {
+    margin-top: 10px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #888;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hdcp-btn.active {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.hdcp-btn:hover {
+    background-color: #444;
+}
+
+.hdcp-btn:active {
+    transform: scale(0.95);
+}
+
+.reboot-btn {
+    margin-top: 5px;
+    background-color: transparent;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 60%;
+    align-self: center;
+    transition: all 0.2s;
+}
+
+.reboot-btn:hover {
+    background-color: #d9534f;
+    color: white;
+}
+
+.reboot-btn:active {
+    transform: scale(0.95);
+}
+
+.sys-btn {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.sys-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn {
+    background-color: var(--success-color);
+    font-size: 1.2rem;
+    padding: 15px 40px;
+}
+
+.action-btn:disabled {
+    background-color: #555;
+    color: #888;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Device States ───────────────────────────────────────────── */
+
+.offline {
+    filter: grayscale(100%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.dest-card.rebooting,
+.source-card.rebooting {
+    pointer-events: none;
+    position: relative;
+    filter: grayscale(100%);
+}
+
+.dest-card.rebooting::after,
+.source-card.rebooting::after {
+    content: "Rebooting...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: var(--active-color);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+/* ── Modal ───────────────────────────────────────────────────── */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal {
+    background-color: var(--panel-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 2px solid var(--crestron-blue);
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal h3 {
+    margin-top: 0;
+    color: var(--crestron-blue);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-actions button.danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.modal-actions button:hover {
+    opacity: 0.9;
+}
+
+/* ── Hidden Utility ──────────────────────────────────────────── */
+
+#web-xpanel-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}

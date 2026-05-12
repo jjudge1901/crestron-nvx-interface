@@ -1,0 +1,19 @@
+{
+    "name": "crestron-nvx-interface",
+    "version": "1.0.0",
+    "description": "HTML5 Web XPanel for Crestron NVX Routing",
+    "main": "index.js",
+    "scripts": {
+        "start": "npx serve public",
+        "build": "echo 'Run: ch5-cli archive -p crestron-nvx-interface -v 1.0.0 -r public -o dist'",
+        "deploy": "echo 'See README.md for deployment instructions'"
+    },
+    "dependencies": {
+        "@crestron/ch5-crcomlib": "^2.17.2",
+        "@crestron/ch5-theme": "^2.8.0",
+        "@crestron/ch5-webxpanel": "^2.8.0"
+    },
+    "devDependencies": {
+        "serve": "^14.2.0"
+    }
+}

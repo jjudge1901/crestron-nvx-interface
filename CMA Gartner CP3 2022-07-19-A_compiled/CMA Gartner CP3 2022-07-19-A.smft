@@ -1,0 +1,12 @@
+<Device Model="CP3">
+   <Network Type="Cresnet" Id="01"/>
+   <Network Type="Ethernet" Id="02">
+      <Device Model="XPanel 2.0 Smart Graphics" DeviceId="03"/>
+      <Device Model="DM-NVX-35xC" DeviceId="11" Name="TX Cam"/>
+      <Device Model="DM-NVX-35xC" DeviceId="12" Name="TX Feed"/>
+      <Device Model="DM-NVX-35xC" DeviceId="13" Name="TX DAW"/>
+      <Device Model="DM-NVX-35x" DeviceId="21" Name="RX Green Room"/>
+      <Device Model="DM-NVX-35x" DeviceId="22" Name="RX Stage Manager"/>
+      <Device Model="DM-NVX-35x" DeviceId="23" Name="TX/RX FOH"/>
+   </Network>
+</Device>

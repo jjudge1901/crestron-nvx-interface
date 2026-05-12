@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVX Control</title>
+    <meta name="description" content="Crestron NVX routing control interface for CP3 processor">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <!-- Web XPanel Connection (must load before app) -->
+    <div id="web-xpanel-container"></div>
+
+    <div class="app-container">
+        <header>
+            <div class="logo">CRESTRON <span class="highlight">NVX</span></div>
+            <div class="status-bar">
+                <span id="connection-status" class="status-disconnected">Disconnected</span>
+                <span id="clock">12:00 PM</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Destinations (Receivers) -->
+            <section class="destinations-section">
+                <h2>Select Destination</h2>
+                <div class="grid-container" id="destinations-grid"></div>
+            </section>
+
+            <!-- Sources (Transmitters) -->
+            <section class="sources-section">
+                <h2>Select Source</h2>
+                <div class="scroll-container" id="sources-list"></div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-left">
+                <button id="reset-btn" class="sys-btn"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+            </div>
+            <div class="footer-right">
+                <button id="take-btn" class="sys-btn action-btn" disabled>TAKE <i class="fa-solid fa-check"></i></button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> Confirm Mode Change</h3>
+            <p>Changing modes requires a two (2) minute reboot.<br>Confirm mode change for <strong id="modal-device-name">Device</strong>?</p>
+            <div class="modal-actions">
+                <button id="modal-cancel">Cancel</button>
+                <button id="modal-confirm" class="danger">Confirm &amp; Reboot</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts: Official Crestron CrComLib + WebXPanel, then app -->
+    <script src="./js/cr-com-lib.js"></script>
+    <script src="./js/ch5-webxpanel.js"></script>
+    <script src="./js/app-bundle.js"></script>
+</body>
+
+</html>

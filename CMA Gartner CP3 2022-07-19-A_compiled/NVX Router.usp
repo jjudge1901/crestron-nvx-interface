@@ -1,0 +1,18 @@
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+             
+#DEFINE_CONSTANT nIN	16
+#DEFINE_CONSTANT nOUT	8
+                                
+ANALOG_INPUT Source[nOUT];
+
+STRING_INPUT StreamIn$[nIN][50];
+
+STRING_OUTPUT Route$[nOUT];
+
+CHANGE Source {
+	INTEGER o;
+	o = GetLastModifiedArrayIndex();
+	Route$[o] = StreamIn$[Source[o]];
+}

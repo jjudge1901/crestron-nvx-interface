@@ -1,0 +1,49 @@
+Tab,Row,Signal_LEFT,Join_LEFT,Join_RIGHT,Signal_RIGHT,Device
+Digital,1,tx_cam_mode_toggle,fb1,press1,tx_cam_mode_toggle,Camera
+Digital,2,tx_feed_mode_toggle,fb2,press2,tx_feed_mode_toggle,Prod Switcher
+Digital,3,tx_daw_mode_toggle,fb3,press3,tx_daw_mode_toggle,Aux
+Digital,4,rx_greenroom_mode_toggle,fb4,press4,rx_greenroom_mode_toggle,Green Room
+Digital,5,rx_stagemgr_mode_toggle,fb5,press5,rx_stagemgr_mode_toggle,Stage Manager
+Digital,6,foh_mode_toggle,fb6,press6,foh_mode_toggle,FOH
+Digital,7,TX_Cam_Reboot,fb7,press7,TX_Cam_Reboot,Camera
+Digital,8,TX_Feed_Reboot,fb8,press8,TX_Feed_Reboot,Prod Switcher
+Digital,9,TX_DAW_Reboot,fb9,press9,TX_DAW_Reboot,Aux
+Digital,10,RX_GreenRoom_Reboot,fb10,press10,RX_GreenRoom_Reboot,Green Room
+Digital,11,RX_StageMgr_Reboot,fb11,press11,RX_StageMgr_Reboot,Stage Manager
+Digital,12,FOH_Reboot,fb12,press12,FOH_Reboot,FOH
+Digital,13,TX_Cam_Online,fb13,press13,TX_Cam_Online,Camera
+Digital,14,TX_Feed_Online,fb14,press14,TX_Feed_Online,Prod Switcher
+Digital,15,TX_DAW_Online,fb15,press15,TX_DAW_Online,Aux
+Digital,16,RX_GreenRoom_Online,fb16,press16,RX_GreenRoom_Online,Green Room
+Digital,17,RX_StageMgr_Online,fb17,press17,RX_StageMgr_Online,Stage Manager
+Digital,18,FOH_Online,fb18,press18,FOH_Online,FOH
+Digital,19,TX_Cam_HDCP_toggle,fb19,press19,TX_Cam_HDCP_toggle,Camera
+Digital,20,TX_Feed_HDCP_toggle,fb20,press20,TX_Feed_HDCP_toggle,Prod Switcher
+Digital,21,TX_DAW_HDCP_toggle,fb21,press21,TX_DAW_HDCP_toggle,Aux
+Digital,22,RX_GreenRoom_HDCP_toggle,fb22,press22,RX_GreenRoom_HDCP_toggle,Green Room
+Digital,23,RX_StageMgr_HDCP_toggle,fb23,press23,RX_StageMgr_HDCP_toggle,Stage Manager
+Digital,24,FOH_HDCP_toggle,fb24,press24,FOH_HDCP_toggle,FOH
+Digital,25,TX_Cam_Video_Sync,fb25,press25,TX_Cam_Video_Sync,Camera
+Digital,26,TX_Feed_Video_Sync,fb26,press26,TX_Feed_Video_Sync,Prod Switcher
+Digital,27,TX_DAW_Video_Sync,fb27,press27,TX_DAW_Video_Sync,Aux
+Digital,28,RX_GreenRoom_Video_Sync,fb28,press28,RX_GreenRoom_Video_Sync,Green Room
+Digital,29,RX_StageMgr_Video_Sync,fb29,press29,RX_StageMgr_Video_Sync,Stage Manager
+Digital,30,FOH_Video_Sync,fb30,press30,FOH_Video_Sync,FOH
+Analog,11,TX_Cam_Source_Select,an_fb11,an_act11,TX_Cam_Source_Select,Camera
+Analog,12,TX_Feed_Source_Select,an_fb12,an_act12,TX_Feed_Source_Select,Prod Switcher
+Analog,13,TX_DAW_Source_Select,an_fb13,an_act13,TX_DAW_Source_Select,Aux
+Analog,14,RX_GreenRoom_Source_Select,an_fb14,an_act14,RX_GreenRoom_Source_Select,Green Room
+Analog,15,RX_StageMgr_Source_Select,an_fb15,an_act15,RX_StageMgr_Source_Select,Stage Manager
+Analog,16,FOH_Source_Select,an_fb16,an_act16,FOH_Source_Select,FOH
+Serial,1,TX_Cam_Name,text_o1,text_i1,TX_Cam_Name,Camera
+Serial,2,TX_Feed_Name,text_o2,text_i2,TX_Feed_Name,Prod Switcher
+Serial,3,TX_DAW_Name,text_o3,text_i3,TX_DAW_Name,Aux
+Serial,4,RX_GreenRoom_Name,text_o4,text_i4,RX_GreenRoom_Name,Green Room
+Serial,5,RX_StageMgr_Name,text_o5,text_i5,RX_StageMgr_Name,Stage Manager
+Serial,6,FOH_Name,text_o6,text_i6,FOH_Name,FOH
+Serial,7,TX_Cam_Resolution,text_o7,text_i7,TX_Cam_Resolution,Camera
+Serial,8,TX_Feed_Resolution,text_o8,text_i8,TX_Feed_Resolution,Prod Switcher
+Serial,9,TX_DAW_Resolution,text_o9,text_i9,TX_DAW_Resolution,Aux
+Serial,10,RX_GreenRoom_Resolution,text_o10,text_i10,RX_GreenRoom_Resolution,Green Room
+Serial,11,RX_StageMgr_Resolution,text_o11,text_i11,RX_StageMgr_Resolution,Stage Manager
+Serial,12,FOH_Resolution,text_o12,text_i12,FOH_Resolution,FOH
