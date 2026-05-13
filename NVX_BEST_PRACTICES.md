@@ -79,5 +79,3 @@ Because `AUTH ON` is effectively required, the Web App must securely negotiate w
 5. **The Handshake:** The CH5 library takes that token and tries the websocket connection a second time, appending the token to the URL (`wss://<CP3-IP>/?token=12345...`). The processor accepts it, and the UI comes online.
 
 If *any* step in this chain is broken (e.g., CORS blocking the token request, Chrome caching a bad password, or the CP3 webserver still rebooting), the entire handshake silently fails.
-
-> **Security History Note:** Processor authentication for this interface was formally enabled and documented on **April 12, 2026 @ 17:39** to comply with this forced security posture. Ensure all local `localhost` testing accounts for this enforced layer.
