@@ -79,3 +79,12 @@ Because `AUTH ON` is effectively required, the Web App must securely negotiate w
 5. **The Handshake:** The CH5 library takes that token and tries the websocket connection a second time, appending the token to the URL (`wss://<CP3-IP>/?token=12345...`). The processor accepts it, and the UI comes online.
 
 If *any* step in this chain is broken (e.g., CORS blocking the token request, Chrome caching a bad password, or the CP3 webserver still rebooting), the entire handshake silently fails.
+
+---
+
+## 7. Network & Subnet Gotchas (IGMP & Limits)
+
+Often, what appears to be a WebXPanel UI bug or an Authentication failure is actually a core networking failure happening under the hood.
+
+* **Multicast Flooding Kills the CP3 (IGMP Snooping):** NVX routing relies on heavy Multicast video traffic. If the physical network switch does not have **IGMP Snooping** and an **IGMP Querier** explicitly configured, those massive video streams will broadcast to every single port on the switch. This will completely overwhelm the CP3's network card, causing your Web App to randomly disconnect, lag, or fail to authenticate because the processor is literally choking to death on video packets.
+* **Zombie WebXPanel Connections (The Hot-Reload Trap):** The CP3 has a strict limit on concurrent WebXPanel connections. When you are developing a CH5 app locally using a modern dev server (like `npm start`), every time you save a file and the browser auto-refreshes, it often leaves the previous secure websocket (`wss://`) connection alive on the processor as a "zombie". After a few saves, the CP3 hits its maximum connection limit and will silently reject you. The fastest fix is a quick `REBOOT` via Toolbox to sever all the zombie sockets.
