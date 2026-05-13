@@ -13,7 +13,7 @@
 | CP3 Processor | `192.168.90.40` | Control System | Rackmount | Master control processor and WebXPanel HTTP server |
 | Camera | `192.168.90.41` | NVX Transceiver | Card (Chassis) | Routes raw camera video onto the multicast network |
 | Prod Switcher | `192.168.90.42` | NVX Transceiver | Card (Chassis) | Routes production switcher output |
-| Aux | `192.168.90.43` | NVX Transceiver | Portable | Auxiliary video input routing |
+| Aux | `192.168.90.43` | NVX Transceiver | Card (Chassis) | Auxiliary video input routing |
 | Green Room | `192.168.90.44` | NVX Transceiver | Standalone | Local display routing for the Green Room |
 | Stage Manager | `192.168.90.45` | NVX Transceiver | Standalone | Local display routing for the Stage Manager |
 | FOH | `192.168.90.46` | NVX Transceiver | Standalone | Local display routing for the Front of House |
