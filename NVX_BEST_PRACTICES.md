@@ -62,7 +62,15 @@ When hunting down silent failures or dropped streams, rely on the correct tools 
 
 ## 6. The WebXPanel Authentication Handshake
 
-Understanding exactly how WebXPanel handles Authentication prevents wild-goose chases when connection errors occur. When `AUTH ON` is set on the processor:
+Understanding exactly how WebXPanel handles Authentication prevents wild-goose chases when connection errors occur.
+
+### Crestron "Forced Authentication" Policy
+Starting with 3-Series firmware v1.603+ and all 4-Series processors, Crestron strictly enforces a **"Secure Deployment"** policy. If a processor is upgraded to modern firmware or undergoes an `INIT` / `RESTORE` factory reset, it completely locks down the device. 
+
+Upon the first boot, the firmware *mandates* the creation of an administrator account via Toolbox before it will allow any network traffic, SIMPL file transfers, or WebXPanel connections. You cannot simply bypass this; it is a permanent hardware-level security posture.
+
+### The Handshake Mechanics
+Because `AUTH ON` is effectively required, the Web App must securely negotiate with the processor:
 
 1. **The Rejection:** The CH5 Web App attempts to open a direct websocket (`wss://<CP3-IP>`) and is immediately rejected by the processor.
 2. **The Token Request:** The `ch5-webxpanel` library catches the rejection and automatically fires an HTTPS `GET` request to `/cws/websocket/getWebSocketToken`.
@@ -71,3 +79,5 @@ Understanding exactly how WebXPanel handles Authentication prevents wild-goose c
 5. **The Handshake:** The CH5 library takes that token and tries the websocket connection a second time, appending the token to the URL (`wss://<CP3-IP>/?token=12345...`). The processor accepts it, and the UI comes online.
 
 If *any* step in this chain is broken (e.g., CORS blocking the token request, Chrome caching a bad password, or the CP3 webserver still rebooting), the entire handshake silently fails.
+
+> **Security History Note:** Processor authentication for this interface was formally enabled and documented on **April 12, 2026 @ 17:39** to comply with this forced security posture. Ensure all local `localhost` testing accounts for this enforced layer.
