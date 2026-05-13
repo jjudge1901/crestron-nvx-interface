@@ -8,11 +8,15 @@
 
 ## 1. System Architecture & IP Reference
 
-| Device Name | Role | IP Address | Multicast Block |
+| Device Name | IP Address | Equipment Type | Short Description |
 |---|---|---|---|
-| CP3 Processor | Control System / Web Host | `192.168.90.40` | N/A |
-| NVX FOH | Transmitter / Receiver | *DHCP/Static* | *TBD / 239.1.1.x* |
-| NVX Stage Manager | Transmitter / Receiver | *DHCP/Static* | *TBD / 239.1.1.y* |
+| CP3 Processor | `192.168.90.40` | Control System | Master control processor and WebXPanel HTTP server |
+| Camera | `192.168.90.41` | NVX Transceiver | Routes raw camera video onto the multicast network |
+| Prod Switcher | `192.168.90.42` | NVX Transceiver | Routes production switcher output |
+| Aux | `192.168.90.43` | NVX Transceiver | Auxiliary video input routing |
+| Green Room | `192.168.90.44` | NVX Transceiver | Local display routing for the Green Room |
+| Stage Manager | `192.168.90.45` | NVX Transceiver | Local display routing for the Stage Manager |
+| FOH | `192.168.90.46` | NVX Transceiver | Local display routing for the Front of House |
 
 ---
 
