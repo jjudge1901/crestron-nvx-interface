@@ -1,90 +1,99 @@
-# Crestron NVX Integration & Debugging Guide
+# Crestron NVX & CH5 Interface — Reference
 
-> **Governance Note:** General software development workflows, repository management, and code standards are strictly governed by the **AGENTS** framework. Do not duplicate AGENTS procedures here. This document serves *only* as a domain-specific technical reference for Crestron NVX and CH5 WebXPanel idiosyncrasies.
-
----
-
-## 1. Zero-Loss Hardware Synchronization (SIMPL Windows)
-
-The most common source of UI bugs in Crestron systems is "fake" logic. When programming the CP3 to interface with NVX hardware, the UI must strictly reflect reality.
-
-* **The Golden Rule:** Never use dummy logic (e.g., `Multiple NOT` or `Toggle` symbols) to drive UI feedback. If a network switch dies or an NVX endpoint reboots, the UI must instantly gray out, not pretend the system is fine.
-* **Online Status:** Always tie the physical `DeviceReady_F` (or equivalent) output pin from the hardware NVX symbol directly to the WebXPanel digital feedback (`d_fb`). This guarantees the Web App knows exactly when a device drops offline.
-* **Routing State:** NVX routing relies on Analog values, not digital pulses. Always map the `ActiveVideoSource_F` analog output from the NVX symbol to the WebXPanel analog feedback (`an_fb`). This ensures the UI perfectly shadows what the Receiver is actually decoding, even if the route was changed via a different interface.
+> **Target Hardware:** CP3, NVX-35x/36x series
+> **Minimum Firmware:** 1.603+ (CP3 Secure Deployment)
+> **Governance Note:** Governed by the AGENTS framework. Do not duplicate AGENTS procedures here.
 
 ---
 
-## 2. WebXPanel & Authentication (The CORS Trap)
+## 1. System Architecture & IP Reference
 
-When building CH5 Web Apps locally, Chrome's security policies will frequently clash with the CP3.
-
-* **The Error:** If CP3 Authentication is enabled, developing a CH5 app locally on `http://localhost:3000` will silently fail. The browser console will show a `401 Unauthorized` or `blocked by CORS policy` error because Chrome strictly blocks cross-origin websocket token requests.
-* **Local Dev Workaround:** 
-    * *Option A:* Temporarily type `AUTH OFF` in the CP3 Text Console while developing.
-    * *Option B:* Use an "Allow CORS: Access-Control-Allow-Origin" Chrome extension to bypass the browser restriction.
-* **Production Resolution:** Deploying the compiled Web App directly to the CP3 internal web server permanently resolves the CORS issue. Once deployed, the Web App and the CP3 API share the exact same IP address, satisfying Chrome's origin requirements.
+| Device Name | Role | IP Address | Multicast Block |
+|---|---|---|---|
+| CP3 Processor | Control System / Web Host | `192.168.90.40` | N/A |
+| NVX FOH | Transmitter / Receiver | *DHCP/Static* | *TBD / 239.1.1.x* |
+| NVX Stage Manager | Transmitter / Receiver | *DHCP/Static* | *TBD / 239.1.1.y* |
 
 ---
 
-## 3. Browser Caching & SSL Certificates
-
-WebXPanel relies on secure websockets (WSS), which are highly sensitive to certificate and credential caching.
-
-* **The Silent "Access Denied":** Chrome aggressively caches self-signed SSL blocks and failed WebXPanel passwords. If the Web App is instantly rejecting your connection:
-    1. Open `https://<CP3-IP-ADDRESS>` in a new tab and explicitly click **Advanced > Proceed to Unsafe**.
-    2. If Chrome is automatically injecting a bad cached password in the background, forcefully override it in the URL: `https://<USERNAME>:<PASSWORD>@<CP3-IP-ADDRESS>`.
-    3. When in doubt, use an Incognito Window to ensure a 100% clean connection slate.
-* **CP3 Reboot Delays:** After issuing a `REBOOT` command via Toolbox, it takes the CP3 2 to 3 minutes to fully initialize its internal web services. WebXPanel will aggressively refuse connections during this initialization window.
-
----
-
-## 4. Manual Hardware Routing (Bypassing the CP3)
-
-If the SIMPL Windows program is acting up, you can prove the physical network and AV hardware work by bypassing the control system entirely.
-
-1. **Grab the Stream:** Log into the **Transmitter's** web interface. Navigate to the Stream tab and copy its **Multicast Address** (e.g., `239.1.1.8`).
-2. **Subscribe the Receiver:** Log into the **Receiver's** web interface. Navigate to the Stream tab, paste the Multicast Address into the subscription field, and click Save.
-3. **Verify:** The status should change to "Stream started" within 3 seconds, proving the network infrastructure is healthy.
-
----
-
-## 5. Firmware & Development Tools
-
-When hunting down silent failures or dropped streams, rely on the correct tools and verify your firmware.
-
-* **Firmware Mismatches:** NVX devices MUST be on compatible firmware versions to properly subscribe to each other. A mix of vastly different firmwares across Transmitters and Receivers can cause a stream to silently fail to start even if the Multicast Address is correct. Always keep endpoints updated and unified.
-* **Crestron Toolbox (Text Console):** The ultimate source of truth for the CP3 processor.
-  * Use the `IPT` command to instantly see if the WebXPanel (IP-ID) or NVX endpoints are officially communicating with the processor.
-  * Use `ADDUSER`, `AUTH ON/OFF`, and `REBOOT` for rapid permission and security resets.
-* **Chrome DevTools (Console & Network):** The ultimate source of truth for the Web App. Always monitor the Console for strict `[WXP]` authentication failures, secure Web Socket (`wss://`) disconnects, and strict browser CORS blocks.
-
----
-
-## 6. The WebXPanel Authentication Handshake
-
-Understanding exactly how WebXPanel handles Authentication prevents wild-goose chases when connection errors occur.
+## 2. Authentication & Security (Forced Auth)
 
 ### Crestron "Forced Authentication" Policy
-Starting with 3-Series firmware v1.603+ and all 4-Series processors, Crestron strictly enforces a **"Secure Deployment"** policy. If a processor is upgraded to modern firmware or undergoes an `INIT` / `RESTORE` factory reset, it completely locks down the device. 
+Starting with 3-Series firmware v1.603+ and all 4-Series processors, Crestron strictly enforces a **"Secure Deployment"** policy.
+Upon the first boot after an `INIT` / `RESTORE`, the firmware *mandates* the creation of an administrator account via Toolbox before it will allow any network traffic, SIMPL file transfers, or WebXPanel connections.
 
-Upon the first boot, the firmware *mandates* the creation of an administrator account via Toolbox before it will allow any network traffic, SIMPL file transfers, or WebXPanel connections. You cannot simply bypass this; it is a permanent hardware-level security posture.
-
-### The Handshake Mechanics
+### The WebXPanel Handshake Mechanics
 Because `AUTH ON` is effectively required, the Web App must securely negotiate with the processor:
-
 1. **The Rejection:** The CH5 Web App attempts to open a direct websocket (`wss://<CP3-IP>`) and is immediately rejected by the processor.
-2. **The Token Request:** The `ch5-webxpanel` library catches the rejection and automatically fires an HTTPS `GET` request to `/cws/websocket/getWebSocketToken`.
+2. **The Token Request:** The `ch5-webxpanel` library catches the rejection and fires an HTTPS `GET` request to `/cws/websocket/getWebSocketToken`.
 3. **The Prompt:** This specific endpoint is protected by Basic Authentication. If Chrome doesn't have a cached password, it throws the native browser Username/Password popup.
-4. **The Validation:** When you enter valid `ADDUSER` credentials (e.g., `webadmin`), the CP3 validates them and returns a temporary, cryptographic WebSocket Token.
-5. **The Handshake:** The CH5 library takes that token and tries the websocket connection a second time, appending the token to the URL (`wss://<CP3-IP>/?token=12345...`). The processor accepts it, and the UI comes online.
-
-If *any* step in this chain is broken (e.g., CORS blocking the token request, Chrome caching a bad password, or the CP3 webserver still rebooting), the entire handshake silently fails.
+4. **The Validation:** When valid `ADDUSER` credentials (e.g., `webadmin`) are entered, the CP3 returns a temporary, cryptographic WebSocket Token.
+5. **The Handshake:** The CH5 library appends the token to the URL (`wss://<CP3-IP>/?token=12345...`) and connects.
 
 ---
 
-## 7. Network & Subnet Gotchas (IGMP & Limits)
+## 3. CH5 Signal Mapping & Data Types
 
-Often, what appears to be a WebXPanel UI bug or an Authentication failure is actually a core networking failure happening under the hood.
+When programming the CP3 to interface with NVX hardware, the UI must strictly reflect reality, not "fake" dummy logic.
 
-* **Multicast Flooding Kills the CP3 (IGMP Snooping):** NVX routing relies on heavy Multicast video traffic. If the physical network switch does not have **IGMP Snooping** and an **IGMP Querier** explicitly configured, those massive video streams will broadcast to every single port on the switch. This will completely overwhelm the CP3's network card, causing your Web App to randomly disconnect, lag, or fail to authenticate because the processor is literally choking to death on video packets.
-* **Zombie WebXPanel Connections (The Hot-Reload Trap):** The CP3 has a strict limit on concurrent WebXPanel connections. When you are developing a CH5 app locally using a modern dev server (like `npm start`), every time you save a file and the browser auto-refreshes, it often leaves the previous secure websocket (`wss://`) connection alive on the processor as a "zombie". After a few saves, the CP3 hits its maximum connection limit and will silently reject you. The fastest fix is a quick `REBOOT` via Toolbox to sever all the zombie sockets.
+| SIMPL Windows Type | CH5 Web UI Equivalent | Purpose in NVX Integration |
+|---|---|---|
+| **Digital** | Boolean (`b`) | **Online Status**: Tie `DeviceReady_F` to a digital feedback (`d_fb`) to show if the NVX is offline. |
+| **Analog** | Integer (`n`) | **Routing State**: Map `ActiveVideoSource_F` to analog feedback (`an_fb`) to accurately reflect physical video routing. |
+| **Serial** | String (`s`) | Text data (IP Addresses, stream names). |
+
+> **CRITICAL**: Never use dummy logic (e.g., `Multiple NOT` or `Toggle` symbols) to drive UI feedback for NVX routing. The UI must instantly gray out if a switch dies or a device goes offline.
+
+---
+
+## 4. Toolbox Console Commands
+
+| Command | Purpose |
+|---|---|
+| `IPT` | See the IP Table. The ultimate source of truth for whether WebXPanel or NVX endpoints are communicating with the processor. |
+| `USERSTAT` | View current authentication settings and active user sessions. |
+| `ADDUSER <usr> <pwd>` | Create an administrator account (required for modern firmware). |
+| `AUTH ON` / `AUTH OFF` | Toggle processor-wide authentication. |
+| `REBOOT` | Restart the processor. *Note: The webserver takes 2-3 minutes to initialize after reboot.* |
+
+---
+
+## 5. WebXPanel Status Codes & Errors
+
+| Error Code / Message | Meaning | Resolution |
+|---|---|---|
+| `401 Unauthorized` | Missing Token / Bad Credentials | Enter correct Username/Password. Clear Chrome cache if it's injecting a bad password. |
+| `blocked by CORS policy` | Cross-Origin Request Blocked | Disable Auth during local dev, use a CORS bypass extension, or deploy to CP3 internal webserver. |
+| `WebSocket connection failed` | WSS Socket Rejected | The CP3 connection limit was reached (Zombie connections) OR the CP3 webserver is still rebooting. Issue a `REBOOT` to clear zombies. |
+
+---
+
+## 6. JavaScript Usage Pattern (CH5 Initialization)
+
+```javascript
+import { WebXPanel, isActive } from "@crestron/ch5-webxpanel";
+
+const configuration = {
+    host: '192.168.90.40', // CP3 IP Address
+    ipId: '0x03',          // IP ID matching the SIMPL Windows WebXPanel symbol
+    roomId: '',
+};
+
+if (isActive) {
+    console.log("Initializing WebXPanel securely...");
+    WebXPanel.initialize(configuration);
+    
+    // The CH5 library will automatically handle the getWebSocketToken
+    // handshake if the processor responds with a 401 requirement.
+}
+```
+
+---
+
+## 7. Known Gotchas (Top 5)
+
+1. **Multicast Flooding Kills the CP3 (IGMP Snooping)**: NVX routing relies on heavy Multicast video traffic. If the physical network switch lacks explicitly configured **IGMP Snooping** and an **IGMP Querier**, massive video streams will broadcast to every port, crashing the CP3 network card.
+2. **Zombie WebXPanel Connections (Hot-Reload Trap)**: The CP3 has a strict limit on concurrent WebXPanel connections. `npm start` hot-reloading leaves previous `wss://` connections alive on the processor as "zombies". After a few saves, the CP3 silently rejects you. Fix: `REBOOT` the CP3.
+3. **The CORS Trap**: Developing locally on `localhost:3000` with `AUTH ON` will fail because Chrome strictly blocks cross-origin websocket token requests. Deploy to the processor to resolve permanently.
+4. **The Silent "Access Denied" Cache**: Chrome aggressively caches self-signed SSL blocks. You must explicitly open `https://192.168.90.40` in a new tab and click "Advanced > Proceed to Unsafe" to unblock the UI.
+5. **Firmware Mismatches**: A mix of vastly different firmwares across NVX Transmitters and Receivers can cause a stream to silently fail to start even if the Multicast Address is perfectly matched. Keep endpoints updated and unified.
