@@ -45,3 +45,15 @@ If the SIMPL Windows program is acting up, you can prove the physical network an
 1. **Grab the Stream:** Log into the **Transmitter's** web interface. Navigate to the Stream tab and copy its **Multicast Address** (e.g., `239.1.1.8`).
 2. **Subscribe the Receiver:** Log into the **Receiver's** web interface. Navigate to the Stream tab, paste the Multicast Address into the subscription field, and click Save.
 3. **Verify:** The status should change to "Stream started" within 3 seconds, proving the network infrastructure is healthy.
+
+---
+
+## 5. Firmware & Development Tools
+
+When hunting down silent failures or dropped streams, rely on the correct tools and verify your firmware.
+
+* **Firmware Mismatches:** NVX devices MUST be on compatible firmware versions to properly subscribe to each other. A mix of vastly different firmwares across Transmitters and Receivers can cause a stream to silently fail to start even if the Multicast Address is correct. Always keep endpoints updated and unified.
+* **Crestron Toolbox (Text Console):** The ultimate source of truth for the CP3 processor.
+  * Use the `IPT` command to instantly see if the WebXPanel (IP-ID) or NVX endpoints are officially communicating with the processor.
+  * Use `ADDUSER`, `AUTH ON/OFF`, and `REBOOT` for rapid permission and security resets.
+* **Chrome DevTools (Console & Network):** The ultimate source of truth for the Web App. Always monitor the Console for strict `[WXP]` authentication failures, secure Web Socket (`wss://`) disconnects, and strict browser CORS blocks.
