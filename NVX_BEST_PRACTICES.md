@@ -57,3 +57,17 @@ When hunting down silent failures or dropped streams, rely on the correct tools 
   * Use the `IPT` command to instantly see if the WebXPanel (IP-ID) or NVX endpoints are officially communicating with the processor.
   * Use `ADDUSER`, `AUTH ON/OFF`, and `REBOOT` for rapid permission and security resets.
 * **Chrome DevTools (Console & Network):** The ultimate source of truth for the Web App. Always monitor the Console for strict `[WXP]` authentication failures, secure Web Socket (`wss://`) disconnects, and strict browser CORS blocks.
+
+---
+
+## 6. The WebXPanel Authentication Handshake
+
+Understanding exactly how WebXPanel handles Authentication prevents wild-goose chases when connection errors occur. When `AUTH ON` is set on the processor:
+
+1. **The Rejection:** The CH5 Web App attempts to open a direct websocket (`wss://<CP3-IP>`) and is immediately rejected by the processor.
+2. **The Token Request:** The `ch5-webxpanel` library catches the rejection and automatically fires an HTTPS `GET` request to `/cws/websocket/getWebSocketToken`.
+3. **The Prompt:** This specific endpoint is protected by Basic Authentication. If Chrome doesn't have a cached password, it throws the native browser Username/Password popup.
+4. **The Validation:** When you enter valid `ADDUSER` credentials (e.g., `webadmin`), the CP3 validates them and returns a temporary, cryptographic WebSocket Token.
+5. **The Handshake:** The CH5 library takes that token and tries the websocket connection a second time, appending the token to the URL (`wss://<CP3-IP>/?token=12345...`). The processor accepts it, and the UI comes online.
+
+If *any* step in this chain is broken (e.g., CORS blocking the token request, Chrome caching a bad password, or the CP3 webserver still rebooting), the entire handshake silently fails.
